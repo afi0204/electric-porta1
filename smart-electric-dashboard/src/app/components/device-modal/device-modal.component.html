@@ -1,0 +1,46 @@
+<div class="modal-overlay" *ngIf="device" (click)="onOverlayClick($event)">
+  <div class="modal-content"> <!-- Use the smaller modal class -->
+
+    <div class="modal-header">
+      <h3>{{ isEditing ? 'Edit Meter' : 'Meter Details' }}</h3>
+      <button class="modal-close" (click)="onClose()">×</button>
+    </div>
+
+    <div class="modal-body" *ngIf="editableDevice">
+      <!-- VIEW MODE -->
+      <div *ngIf="!isEditing" class="view-mode">
+        <p><strong>Meter ID:</strong> <span>{{ editableDevice.deviceId }}</span></p>
+        <p><strong>Meter Name:</strong> <span>{{ editableDevice.name }}</span></p>
+        <p><strong>Location:</strong> <span>{{ editableDevice.location }}</span></p>
+        <p><strong>Status:</strong> <span class="status-badge" [ngClass]="editableDevice.status">{{ editableDevice.status }}</span></p>
+        <p><strong>Signal:</strong> <span>{{ editableDevice.networkSignal }}%</span></p>
+      </div>
+
+      <!-- EDIT FORM -->
+      <form *ngIf="isEditing" class="edit-form" (ngSubmit)="saveChanges()">
+        <div class="form-group">
+          <label for="deviceName">Meter Name</label>
+          <input id="deviceName" type="text" [(ngModel)]="editableDevice.name" name="name">
+        </div>
+        <div class="form-group">
+          <label for="deviceLocation">Location</label>
+          <input id="deviceLocation" type="text" [(ngModel)]="editableDevice.location" name="location">
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <div *ngIf="!isEditing">
+        <!-- This button will open the large analytics modal -->
+        <button type="button" class="btn btn-info" (click)="viewAnalytics.emit()">View Analytics</button>
+        <button type="button" class="btn-primary" (click)="enterEditMode()">Edit</button>
+      </div>
+      <div *ngIf="isEditing">
+        <button type="button" class="btn-secondary" (click)="cancelEdit()">Cancel</button>
+        <button type="submit" class="btn btn-success" (click)="saveChanges()">Save Changes</button>
+      </div>
+    </div>
+
+  </div>
+  
+</div>

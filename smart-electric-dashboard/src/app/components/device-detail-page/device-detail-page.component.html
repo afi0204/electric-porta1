@@ -1,0 +1,149 @@
+<div class="detail-page-container" *ngIf="!isLoading && device; else loading">
+
+  <!-- Header -->
+  <header class="detail-header">
+    <a routerLink="/dashboard" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <h1>Meter Details: {{ device.name }}</h1>
+    <div class="header-actions">
+      <select [ngModel]="period" (ngModelChange)="onPeriodChange($event)">
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+        <option value="90d">Last 90 Days</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Top Row -->
+  <div class="top-row">
+    <div class="animation-container card">
+      <h4>Live Power Flow</h4>
+      <div class="power-animation">
+        <div class="tower"><i class="fas fa-broadcast-tower"></i></div>
+        <div class="flow-line">
+          <div class="spark"></div>
+          <div class="spark" style="animation-delay: 0.3s;"></div>
+          <div class="spark" style="animation-delay: 0.6s;"></div>
+          <div class="spark" style="animation-delay: 0.9s;"></div>
+          <div class="spark" style="animation-delay: 1.2s;"></div>
+        </div>
+        <div class="house"><i class="fas fa-home"></i></div>
+      </div>
+      <div class="consumption-display">
+        <div class="consumption-value">
+          {{ formatConsumption(device.lastKnownVolume) | number }}
+          <select [(ngModel)]="consumptionUnit" (ngModelChange)="updateConsumptionUnit()">
+            <option value="kWh">kWh</option>
+            <option value="Wh">Wh</option>
+          </select>
+        </div>
+        <div class="consumption-label">Current Consumption</div>
+      </div>
+    </div>
+
+    <app-stat-cards [cards]="statCards"></app-stat-cards>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="card chart-card">
+      <app-consumption-line-chart [readings]="deviceReadings"></app-consumption-line-chart>
+    </div>
+    <div class="card chart-card">
+      <app-day-night-pie-chart [readings]="deviceReadings"></app-day-night-pie-chart>
+    </div>
+  </div>
+
+  <!-- Daily Detail Chart -->
+  <div class="card daily-detail-card">
+    <div class="card-header">
+      <h4>Second-by-Second Consumption</h4>
+      <div class="daily-filter">
+        <label for="detailDate">Select Day:</label>
+        <input
+          id="detailDate"
+          type="date"
+          [ngModel]="selectedDate"
+          (ngModelChange)="onDateChange($event)">
+      </div>
+    </div>
+    <div class="daily-content">
+      <div class="daily-chart-container">
+        <div *ngIf="!dailyLoading && !dailyError; else dailyState">
+          <app-real-time-chart [readings]="dailyReadings"></app-real-time-chart>
+        </div>
+        <ng-template #dailyState>
+          <div class="placeholder-text">
+            {{ dailyError || 'Loading data...' }}
+          </div>
+        </ng-template>
+      </div>
+      <div class="daily-readings-list" *ngIf="!dailyLoading && !dailyError">
+        <h5>Latest Updates</h5>
+        <div class="readings-scrollable">
+          <div *ngFor="let reading of dailyReadings; let i = index" class="reading-entry">
+            <div class="reading-timestamp">{{ reading.timestamp | date: 'short' }}</div>
+            <div class="reading-data">
+              <span>Volume: {{ reading.volume | number:'1.0-0' }} kWh</span>
+              <span>Consumption: {{ reading.consumptionSinceLast }} Wh</span>
+              <span>Signal: {{ reading.networkSignal }}%</span>
+              <span>Battery: {{ reading.batteryVoltage ? reading.batteryVoltage + 'V' : 'N/A' }}</span>
+            </div>
+          </div>
+          <div *ngIf="dailyReadings.length === 0" class="no-data">No readings for this day.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technician Log / Status Update -->
+  <div class="card log-section">
+    <h4><i class="fas fa-clipboard-list"></i> Technician Log / Status Update</h4>
+
+    <!-- Log Form -->
+    <form class="log-form" (ngSubmit)="submitLog()">
+      <textarea
+        name="newLogComment"
+        [(ngModel)]="newLogComment"
+        placeholder="Add a comment about maintenance or resolution..."
+        [disabled]="isSubmittingLog"
+        required
+      ></textarea>
+      <div class="log-actions">
+        <select name="newLogStatus" [(ngModel)]="newLogStatus" [disabled]="isSubmittingLog">
+          <option value="active">Set Status to: Active</option>
+          <option value="maintenance">Set Status to: Maintenance</option>
+          <option value="inactive">Set Status to: Inactive</option>
+        </select>
+        <button type="submit" class="btn-primary" [disabled]="!newLogComment.trim() || isSubmittingLog">
+          <i *ngIf="isSubmittingLog" class="fas fa-spinner fa-spin"></i>
+          {{ isSubmittingLog ? 'Submitting...' : 'Submit Log' }}
+        </button>
+      </div>
+      <!-- Error Message -->
+      <div *ngIf="logSubmitError" class="alert alert-danger">
+        {{ logSubmitError }}
+      </div>
+    </form>
+
+    <!-- Log History -->
+    <div class="log-history">
+      <h5>History</h5>
+      <div *ngFor="let log of deviceLogs | slice:0:10" class="log-entry">
+        <p class="log-comment">"{{ log.comment }}"</p>
+        <p class="log-meta">
+          Status set to <span class="status-badge" [ngClass]="log.newStatus">{{ log.newStatus }}</span> by <strong>{{ log.author }}</strong> on
+          {{ log.timestamp | date: 'medium' }}
+        </p>
+      </div>
+      <p *ngIf="deviceLogs.length === 0" class="no-logs">No log entries for this device.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Fallback Loading Template -->
+<ng-template #loading>
+  <p>Loading device details...</p>
+</ng-template>

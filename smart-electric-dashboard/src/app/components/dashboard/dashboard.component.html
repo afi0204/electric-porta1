@@ -1,0 +1,213 @@
+<div class="main-layout" *ngIf="appState.stats$ | async as stats">
+
+  <!-- LEFT COLUMN: Main Panel -->
+  <div class="main-panel">
+
+    <!-- Alert Banner -->
+    <div class="alert-banner" *ngIf="stats.alertCount > 0">
+      <i class="fas fa-exclamation-triangle"></i>
+      <strong>{{ stats.alertCount }} Device(s) in Alert State!</strong>
+      <a href="#" (click)="filterByStatus('alert'); $event.preventDefault()">View Alerts</a>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+      <div class="title">
+        <h2>Meter Analytics</h2>
+        <p>Overview of all connected electric meters.</p>
+      </div>
+      <div class="actions">
+        <button class="btn-refresh" (click)="triggerRefresh()" [disabled]="appState.isLoading$ | async">
+          <i class="fas fa-sync-alt" [class.spinning]="appState.isLoading$ | async"></i> Refresh
+        </button>
+      </div>
+    </header>
+
+    <!-- Stat Cards -->
+    <div class="stat-cards-grid">
+      <div class="card stat-card" (click)="filterByStatus('')" [class.active-filter]="statusFilter === ''">
+        <h4>Total Meters</h4>
+        <p class="value">{{ stats.totalCount }}</p>
+      </div>
+      <div class="card stat-card" (click)="filterByStatus('active')" [class.active-filter]="statusFilter === 'active'">
+        <h4>Active</h4>
+        <p class="value success">{{ stats.activeCount }}</p>
+      </div>
+      <div class="card stat-card" (click)="filterByStatus('maintenance')" [class.active-filter]="statusFilter === 'maintenance'">
+        <h4>Maintenance</h4>
+        <p class="value warning">{{ stats.maintenanceCount }}</p>
+      </div>
+      <div class="card stat-card" (click)="filterByStatus('alert')" [class.active-filter]="statusFilter === 'alert'">
+        <h4>Alerts</h4>
+        <p class="value danger">{{ stats.alertCount }}</p>
+      </div>
+    </div>
+
+    <!-- Device List -->
+    <div class="card device-list-card" *ngIf="appState.devices$ | async as paginatedDevices">
+      <div class="card-header">
+        <h3>All Meters</h3>
+        <div class="actions-group">
+          <!-- Search -->
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onFilterOrSortChange()" />
+          </div>
+          <!-- Sorting -->
+          <div class="sort-group">
+            <label for="sortBy">Sort By:</label>
+            <select id="sortBy" [(ngModel)]="sortKey" (ngModelChange)="onFilterOrSortChange()">
+              <option value="lastReadingTimestamp">Latest Reading</option>
+              <option value="name">Name</option>
+              <option value="location">Location</option>
+            </select>
+            <select [(ngModel)]="sortOrder" (ngModelChange)="onFilterOrSortChange()">
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Table -->
+      <table>
+        <thead>
+          <tr>
+            <th (click)="setSort('name')">
+              Meter Name <i *ngIf="sortKey === 'name'" class="fas" [ngClass]="sortOrder === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"></i>
+            </th>
+            <th (click)="setSort('location')">
+              Location <i *ngIf="sortKey === 'location'" class="fas" [ngClass]="sortOrder === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"></i>
+            </th>
+            <th>Status</th>
+            <th>
+              Last Reading
+              <span class="unit-toggle" (click)="toggleUnit()">
+                ({{ displayUnit === 'kWh' ? 'kWh' : 'Wh' }})
+              </span>
+            </th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let device of paginatedDevices.items" [ngClass]="getAlertClass(device.status!)">
+            <td class="device-name-cell">
+              <div class="device-avatar" [ngClass]="device.status">
+                <i [class]="device.status | statusIcon"></i>
+              </div>
+              <div class="device-text">
+                <span class="name">{{ device.name }}</span>
+                <span class="id">{{ device.deviceId }}</span>
+              </div>
+            </td>
+            <td>{{ device.location }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="device.status">{{ device.status | formatStatus }}</span>
+            </td>
+            <td>{{ formatVolume(device.lastKnownVolume) | number }}</td>
+            <td class="action-cell">
+              <button *ngIf="isAlertStatus(device.status!)" class="btn-resolve" (click)="resolveDeviceAlert(device, $event)">Resolve</button>
+              <button class="btn-edit" (click)="openDeviceModal(device)">Edit</button>
+              <a class="btn-view-details" [routerLink]="['/device', device.deviceId]">Details</a>
+            </td>
+          </tr>
+          <tr *ngIf="paginatedDevices.items.length === 0 && !(appState.isLoading$ | async)">
+            <td colspan="5" class="no-results">No devices found matching your criteria.</td>
+          </tr>
+        </tbody>
+
+        <tfoot *ngIf="paginatedDevices.items.length > 0">
+          <tr>
+            <!-- This cell spans the first 2 columns -->
+            <td colspan="2" class="footer-label">
+              <strong>Page Total</strong>
+            </td>
+            <!-- Empty cell for Status -->
+            <td></td>
+            <!-- Cell for total consumption with sparkline -->
+            <td class="footer-total">
+              <strong>{{ currentPageTotalConsumption | number }}</strong>
+              <app-sparkline-chart
+                [data]="getDailyConsumptionData()"
+                (click)="openConsumptionModal()"
+                style="cursor: pointer">
+              </app-sparkline-chart>
+            </td>
+            <!-- Empty cell for Action -->
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination-footer">
+        <div class="pagination-info">
+          Showing <strong>{{ paginatedDevices.items.length }}</strong> of <strong>{{ paginatedDevices.totalCount }}</strong> meters.
+        </div>
+        <div class="pagination-controls" *ngIf="paginatedDevices.totalPages > 1">
+          <button (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+          <span>Page {{ currentPage }} of {{ paginatedDevices.totalPages }}</span>
+          <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === paginatedDevices.totalPages">Next</button>
+          <button (click)="goToPage(paginatedDevices.totalPages)" [disabled]="currentPage === paginatedDevices.totalPages">Last</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: Side Panel -->
+  <div class="side-panel">
+    <header class="side-header">
+      <div class="user-profile">
+        <img src="https://i.pravatar.cc/40" alt="User Avatar" />
+        <span>Admin User</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </header>
+
+    <div class="card">
+      <app-main-analytics-chart [readings]="(appState.readings$ | async) ?? []"></app-main-analytics-chart>
+    </div>
+<br> <br><br><br><br><br><br><br><br><br><br><br>
+    <div class="card" style="margin-top: 2rem;">
+      <h3>Network Health</h3>
+      <p>Overall system status:
+        <span *ngIf="!needsAttention()" style="color: var(--success-green); font-weight: bold;">Operational</span>
+        <span *ngIf="needsAttention()" style="color: var(--warning-orange); font-weight: bold;">Needs Attention</span>
+      </p>
+      <p *ngIf="needsAttention()" class="warning-text">
+        <i class="fas fa-exclamation-triangle"></i> Some devices have low network signal (&lt;30)
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<app-device-modal
+  [device]="deviceForModal"
+  (closeModal)="closeDeviceModal()"
+  (deviceUpdated)="onDeviceUpdated($event)"
+  (viewAnalytics)="openAnalyticsModal(deviceForModal!)">
+</app-device-modal>
+
+<app-analytics-modal
+  [device]="deviceForAnalytics"
+  (closeModal)="closeAnalyticsModal()">
+</app-analytics-modal>
+
+<!-- Consumption Graph Modal -->
+<div class="modal-overlay" *ngIf="showConsumptionModal" (click)="closeConsumptionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Consumption Trend (7 Days)</h3>
+      <button class="close-btn" (click)="closeConsumptionModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <app-consumption-line-chart
+        [readings]="convertToReadings(consumptionModalData)"
+        [period]="'7d'">
+      </app-consumption-line-chart>
+    </div>
+  </div>
+</div>

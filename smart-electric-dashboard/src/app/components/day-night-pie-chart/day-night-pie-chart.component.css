@@ -1,0 +1,4 @@
+.chart-container {
+  height: 200px;
+  position: relative; /* Needed for correct sizing */
+}

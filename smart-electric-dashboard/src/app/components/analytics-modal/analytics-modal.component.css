@@ -1,0 +1,119 @@
+/* This dark overlay covers the entire screen */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; /* Must be higher than the small modal */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* The main white content box */
+.modal-content-large {
+  background: #f7f8fc; /* A light grey background */
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1200px; /* A nice wide modal for analytics */
+  max-height: 90vh;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Modal header with title and close button */
+.modal-header {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+.modal-header h3 { margin: 0; }
+.modal-close { background: none; border: none; font-size: 1.75rem; cursor: pointer; color: #888; }
+
+/* Modal body with scrolling */
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* --- THIS IS THE KEY FIX FOR THE TWO-COLUMN LAYOUT --- */
+.details-grid {
+  display: grid;
+  /* Left column takes up 1 part, right column takes up 2 parts of the space */
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+.details-panel, .analytics-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* General card styling inside the modal */
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card h4 {
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+}
+
+/* Specific styling for the information panel */
+.info-grid p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+.info-grid p strong { color: #333; }
+.info-grid p span { color: #555; }
+.status-badge { /* ... copy from your global styles if needed ... */ }
+
+/* Specific styling for the analytics panel */
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.analytics-header h4 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+/* --- THIS IS THE KEY FIX FOR THE THREE-COLUMN CHART LAYOUT --- */
+.charts-grid {
+    display: grid;
+    /* Create three equal-width columns */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.loading-placeholder {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+}

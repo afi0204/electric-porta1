@@ -1,0 +1,63 @@
+
+<nav class="main-nav">
+  <div class="nav-content">
+
+    <!-- Left Side: Brand/Logo -->
+     <a class="nav-brand" routerLink="/dashboard">
+      <i class="fas fa-bolt"></i>
+      <span>Electric Consumption</span>
+    </a>
+
+    <!-- Right Side: Page Links & NEW Notification Bell -->
+    <div class="nav-right-section">
+      <div class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">Home</a>
+        <a routerLink="/reports" routerLinkActive="active">Reports</a>
+      </div>
+
+      <!-- ============================================= -->
+      <!--      NEW: NOTIFICATION BELL & DROPDOWN      -->
+      <!-- ============================================= -->
+      <div class="notification-area" *ngIf="appState.stats$ | async as stats">
+        <button class="notification-bell" (click)="toggleNotificationDropdown()">
+          <i class="fas fa-bell"></i>
+          <!-- Badge only shows if there are alerts -->
+          <span *ngIf="stats.alertCount > 0" class="notification-badge">{{ stats.alertCount }}</span>
+        </button>
+
+        <!-- The dropdown panel -->
+        <div class="notification-dropdown" *ngIf="showNotificationDropdown">
+          <div class="dropdown-header">
+            You have {{ stats.alertCount }} new notification(s)
+          </div>
+          <div class="dropdown-body">
+            <div *ngIf="(appState.alertDevices$ | async) as alertDevices; else noAlerts">
+              <!-- Loop through the alert devices -->
+              <a *ngFor="let alert of alertDevices"
+                 class="notification-item"
+                 [routerLink]="['/device', alert.deviceId]"
+                 (click)="showNotificationDropdown = false">
+                <div class="icon-container" [ngClass]="alert.status">
+                  <i class="fas" [ngClass]="getIconForStatus(alert.status!)"></i>
+                </div>
+                <div class="text-container">
+                  <p class="title"><strong>{{ alert.name }}</strong></p>
+                  <p class="subtitle">Status: {{ alert.status | titlecase }}</p>
+                </div>
+              </a>
+            </div>
+            <ng-template #noAlerts>
+              <div class="no-notifications">No new alerts.</div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <!-- ============================================= -->
+
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

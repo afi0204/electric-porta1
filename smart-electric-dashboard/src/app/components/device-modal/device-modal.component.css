@@ -1,0 +1,87 @@
+/* This dark overlay covers the entire screen */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top of everything else */
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* This is the white content box in the middle */
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  width: 90%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Header styling */
+.modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 { margin: 0; font-size: 1.25rem; }
+.modal-close { background: none; border: none; font-size: 1.75rem; cursor: pointer; color: #888; }
+
+/* Body styling */
+.modal-body { padding: 24px; }
+.view-mode p { display: flex; justify-content: space-between; margin: 0 0 12px; border-bottom: 1px dashed #eee; padding-bottom: 12px; }
+.view-mode p strong { color: #333; }
+
+/* Form styling */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-weight: 500; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+
+/* Footer and buttons */
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background-color: var(--primary-blue); color: white; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-success { background-color: var(--success-green); color: white; }
+.modal-overlay { /* ... same as before ... */ }
+.modal-content { /* Styles for the smaller box */
+  background: white;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.modal-header { padding: 16px 24px; border-bottom: 1px solid #eee; /* ... */ }
+.modal-body { padding: 24px; }
+.view-mode p { display: flex; justify-content: space-between; margin: 0 0 12px; }
+.form-group { /* ... */ }
+.modal-footer { padding: 16px 24px; background: #f7f8fc; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; }
+.btn, .btn-primary, .btn-secondary, .btn-success, .btn-info { /* ... button styles ... */ }

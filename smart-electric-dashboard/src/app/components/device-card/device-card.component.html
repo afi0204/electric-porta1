@@ -1,0 +1,16 @@
+<div class="device-card" [ngClass]="'status-' + (device.status || 'unknown')">
+  <div class="device-header">
+    <h3>{{ device.name }}</h3>
+    <span class="device-status">{{ device.status }}</span>
+  </div>
+  <div class="device-info">
+    <p><i class="fas fa-id-card"></i> <strong>ID:</strong> {{ device.deviceId }}</p>
+    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ device.location }}</p>
+    <!-- Battery bar and info are removed -->
+    <p><i class="fas fa-signal"></i> <strong>Signal:</strong> {{ device.networkSignal }}%</p>
+    <div class="signal-bar">
+        <div class="signal-level-fill" [style.width.%]="device.networkSignal"></div>
+    </div>
+    <p><i class="fas fa-clock"></i> <strong>Last Reading:</strong> {{ device.lastReadingTimestamp | date:'MMM d, y, h:mm a' }}</p>
+  </div>
+</div>

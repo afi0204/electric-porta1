@@ -1,0 +1,111 @@
+/* src/styles.css */
+
+/* 1. Define a Modern "Electrical" Color Palette */
+:root {
+  --bg-color: #f7f8fc;                  /* A very light, clean grey for the page background */
+  --card-bg-color: #ffffff;             /* Pure white for all cards and panels */
+  --text-color: #212529;                /* A soft, dark black for primary text */
+  --text-muted-color: #6c757d;           /* A muted grey for labels and secondary text */
+  --border-color: #e9ecef;              /* A very light grey for borders and lines */
+
+  --primary-blue: #007bff;               /* The main interactive color for buttons and links */
+  --electric-yellow: #ffc107;            /* A vibrant yellow for warnings or highlights */
+  --success-green: #28a745;              /* A clear green for success states */
+
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* A soft, modern shadow for cards */
+  --card-border-radius: 12px;           /* Rounded corners for all cards */
+}
+
+/* 2. Global Body and Font Styling */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif; /* Use the new font */
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 3. A general 'card' class we can reuse */
+.card {
+  background-color: var(--card-bg-color);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+}
+/* In src/styles.css */
+.main-nav { background-color: #212529; padding: 0 24px; }
+.nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.nav-brand { color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 600; padding: 16px 0; }
+.nav-brand .fa-bolt { color: var(--electric-yellow); }
+.nav-links a { color: #ccc; text-decoration: none; padding: 20px 16px; transition: background-color 0.2s; }
+.nav-links a:hover { background-color: #343a40; }
+.nav-links a.active { color: white; border-bottom: 3px solid var(--primary-blue); }
+/* Add to the bottom of src/styles.css */
+
+/* Main Navigation Bar Styling */
+.main-nav {
+  background-color: #ffffff; /* Make the nav white */
+  border-bottom: 1px solid var(--border-color); /* A subtle line underneath */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 0 24px;
+  position: sticky; /* Make it stick to the top when scrolling */
+  top: 0;
+  z-index: 999;
+}
+
+.nav-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+/* Brand/Logo Styling */
+.nav-brand {
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.nav-brand .fa-bolt {
+  color: var(--electric-yellow);
+}
+
+/* Page Links Styling */
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-links a {
+  color: var(--text-muted-color);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 3px solid transparent; /* Placeholder for the active state */
+}
+
+.nav-links a:hover {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Style for the active link */
+.nav-links a.active {
+  color: var(--primary-blue);
+  border-bottom-color: var(--primary-blue);
+}
+
+/* A container for the main page content below the nav */
+.main-content {
+  /* This can be empty, but it's good practice to have a wrapper */
+}

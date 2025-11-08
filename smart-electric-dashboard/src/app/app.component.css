@@ -1,0 +1,121 @@
+/* Styles for the main application component, including the navigation bar and notification dropdown. */
+
+/* Wrapper for the right side of the navigation bar */
+.nav-right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Container for the notification bell and its dropdown */
+.notification-area {
+  position: relative;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted-color);
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+}
+.notification-bell:hover {
+  color: var(--text-color);
+}
+
+/* The red number badge on the bell icon */
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--danger-red);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* The dropdown panel for notifications */
+.notification-dropdown {
+  position: absolute;
+  top: 120%; /* Position it below the bell */
+  right: 0;
+  width: 350px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+  border: 1px solid #eee;
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  background-color: #f7f8fc;
+  border-bottom: 1px solid #eee;
+}
+
+/* A single item within the notification list */
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+.notification-item:hover {
+  background-color: #f7f8fc;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item .icon-container {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Specific background color for alert-related icons */
+.icon-container.cover_open,
+.icon-container.reversed,
+.icon-container.terminal_open {
+  background-color: var(--danger-red);
+}
+
+.notification-item .text-container p {
+  margin: 0;
+  line-height: 1.4;
+}
+.text-container .title { font-weight: 500; }
+.text-container .subtitle { font-size: 0.85rem; color: #888; }
+
+/* Message shown when there are no notifications */
+.no-notifications {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+}
+
+/* Background color for the main content area that holds the <router-outlet> */
+main {
+  background-color: #f7f8fc;
+}
